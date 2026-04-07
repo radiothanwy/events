@@ -24,14 +24,45 @@
             padding: 2rem;
             color: var(--text-main);
             box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
         }
 
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
+            width: 100%;
+            max-width: 600px;
+            margin-top: 2rem;
+        }
+
+        /* Dynamic Toggle Switch */
+        .toggle-wrapper {
+            display: flex;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 0.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .toggle-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
         }
 
         .glass-panel {
@@ -42,16 +73,25 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
-        h2 {
-            margin-top: 0;
-            color: var(--primary);
-            font-weight: 600;
+        /* View Switching Animation */
+        .view {
+            display: none;
+            animation: fadeSlideIn 0.4s ease forwards;
         }
 
-        .form-group {
-            margin-bottom: 1.5rem;
+        .view.active {
+            display: block;
         }
 
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 { margin-top: 0; color: var(--primary); font-weight: 600; }
+        
+        .form-group { margin-bottom: 1.5rem; }
+        
         label {
             display: block;
             margin-bottom: 0.5rem;
@@ -75,7 +115,7 @@
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
 
-        button {
+        .submit-btn {
             background-color: var(--primary);
             color: white;
             border: none;
@@ -88,18 +128,14 @@
             transition: background-color 0.3s, transform 0.1s;
         }
 
-        button:hover {
-            background-color: var(--primary-hover);
-        }
-
-        button:active {
-            transform: scale(0.98);
-        }
+        .submit-btn:hover { background-color: var(--primary-hover); }
+        .submit-btn:active { transform: scale(0.98); }
 
         /* Timeline / Events UI */
         .timeline {
             position: relative;
             padding-left: 20px;
+            margin-top: 1rem;
         }
 
         .timeline::before {
@@ -113,28 +149,27 @@
         }
 
         .event-card {
-            background: white;
+            background: #f9fafb;
+            border: 1px solid #E5E7EB;
             border-radius: 12px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             position: relative;
             opacity: 0;
-            transform: translateY(20px);
-            animation: slideUp 0.5s ease forwards;
+            transform: translateX(-10px);
+            animation: slideRight 0.4s ease forwards;
         }
 
         .event-card::before {
             content: '';
             position: absolute;
-            left: -25px;
+            left: -26px;
             top: 24px;
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             background: var(--primary);
             border: 3px solid white;
-            box-shadow: 0 0 0 2px var(--primary);
         }
 
         .event-time {
@@ -142,25 +177,13 @@
             color: var(--primary);
             font-weight: 600;
             margin-bottom: 0.5rem;
+            line-height: 1.4;
         }
 
-        .event-title {
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin: 0 0 0.5rem 0;
-        }
+        .event-title { font-weight: 600; font-size: 1.1rem; margin: 0 0 0.5rem 0; }
+        .event-details { font-size: 0.9rem; color: var(--text-muted); margin: 0; }
 
-        .event-details {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin: 0;
-        }
-
-        .loader {
-            text-align: center;
-            color: var(--text-muted);
-            font-style: italic;
-        }
+        .loader { text-align: center; color: var(--text-muted); font-style: italic; padding: 2rem 0; }
 
         #messageBox {
             margin-top: 1rem;
@@ -168,31 +191,32 @@
             border-radius: 8px;
             display: none;
             text-align: center;
+            animation: fadeSlideIn 0.3s ease;
         }
 
-        .success { background: #D1FAE5; color: #065F46; }
-        .error { background: #FEE2E2; color: #991B1B; }
+        .success { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
+        .error { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
 
-        @keyframes slideUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes slideRight {
+            to { opacity: 1; transform: translateX(0); }
         }
 
-        /* Responsive Layout */
         @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
             body { padding: 1rem; }
+            .glass-panel { padding: 1.5rem; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="glass-panel">
+    
+    <div class="toggle-wrapper">
+        <button class="toggle-btn active" id="btnBook" onclick="switchView('book')">Log Event</button>
+        <button class="toggle-btn" id="btnSchedule" onclick="switchView('schedule')">Show Schedule</button>
+    </div>
+
+    <div id="bookView" class="glass-panel view active">
         <h2>Book the Workspace</h2>
         <form id="bookingForm">
             <div class="form-group">
@@ -204,7 +228,7 @@
                 <input type="text" id="company" required placeholder="Company A">
             </div>
             <div class="form-group">
-                <label for="purpose">What are you using it for?</label>
+                <label for="purpose">Purpose of Use</label>
                 <input type="text" id="purpose" required placeholder="Client Meeting, Brainstorming, etc.">
             </div>
             <div class="form-group">
@@ -221,80 +245,142 @@
                     <input type="text" id="endTime" required placeholder="00:00">
                 </div>
             </div>
-            <button type="submit" id="submitBtn">Log Workspace Session</button>
+            <button type="submit" id="submitBtn" class="submit-btn">Reserve Space</button>
         </form>
         <div id="messageBox"></div>
     </div>
 
-    <div class="glass-panel">
-        <h2>Today's Schedule</h2>
-        <div id="eventsLoader" class="loader">Loading schedule...</div>
+    <div id="scheduleView" class="glass-panel view">
+        <h2>Upcoming Schedule</h2>
+        <div id="eventsLoader" class="loader">Fetching schedule...</div>
         <div class="timeline" id="eventsTimeline">
             </div>
     </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-    // --- IMPORTANT: REPLACE THIS URL WITH YOUR DEPLOYED GOOGLE WEB APP URL ---
+    // --- PASTE YOUR WORKING WEB APP URL HERE ---
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyekQjxKHmWbrBE1HAzBjKMhGY1Rd0B3WtoTyUqRlA-ze5QyrDpjoEupLi4oDBWfDOc/exec';
 
-    // Initialize Elegant Date/Time Pickers
-    flatpickr("#date", { 
-        minDate: "today",
-        dateFormat: "Y-m-d"
-    });
-    
-    flatpickr("#startTime", {
-        enableTime: true,
-        noCalendar: true,
-        dateFormat: "H:i",
-        time_24hr: false
-    });
+    // UI View Switcher Logic
+    function switchView(viewName) {
+        document.getElementById('bookView').classList.remove('active');
+        document.getElementById('scheduleView').classList.remove('active');
+        document.getElementById('btnBook').classList.remove('active');
+        document.getElementById('btnSchedule').classList.remove('active');
 
-    flatpickr("#endTime", {
-        enableTime: true,
-        noCalendar: true,
-        dateFormat: "H:i",
-        time_24hr: false
-    });
+        if(viewName === 'book') {
+            document.getElementById('bookView').classList.add('active');
+            document.getElementById('btnBook').classList.add('active');
+        } else {
+            document.getElementById('scheduleView').classList.add('active');
+            document.getElementById('btnSchedule').classList.add('active');
+            loadEvents(); 
+        }
+    }
+
+    // Initialize Pickers
+    flatpickr("#date", { minDate: "today", dateFormat: "Y-m-d" });
+    flatpickr("#startTime", { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: false });
+    flatpickr("#endTime", { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: false });
+
+    // FORMATTING FUNCTION: Solves the Time Zone Offset Bug
+    function formatBeautifulDate(dateStr, startStr, endStr) {
+        try {
+            // Let the browser handle the UTC to Local conversion natively
+            const temp = new Date(dateStr);
+            const yyyy = temp.getFullYear();
+            const mm = temp.getMonth() + 1;
+            const dd = temp.getDate();
+            
+            // Rebuild a clean date object strictly for getting the weekday
+            const cleanDate = new Date(yyyy, mm - 1, dd, 12, 0, 0);
+            const dayName = cleanDate.toLocaleDateString('en-GB', { weekday: 'long' });
+            
+            // Format strictly as DD/MM/YYYY
+            const formattedDateStr = `${dd}/${mm}/${yyyy}`;
+
+            // Format the Time to AM/PM
+            function parseTime(t) {
+                if (!t) return "TBD";
+                if (typeof t === 'string' && t.includes('T')) {
+                    return new Date(t).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                } else {
+                    let [h, m] = t.toString().split(':');
+                    let timeObj = new Date();
+                    timeObj.setHours(parseInt(h, 10), parseInt(m, 10));
+                    return timeObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                }
+            }
+
+            return `${dayName}, ${formattedDateStr}, from ${parseTime(startStr)} to ${parseTime(endStr)}`;
+        } catch (e) {
+            return "Date formatting error"; 
+        }
+    }
 
     // Fetch and display events
     async function loadEvents() {
         const timeline = document.getElementById('eventsTimeline');
         const loader = document.getElementById('eventsLoader');
         
+        loader.style.display = 'block';
+        timeline.innerHTML = ''; 
+
         try {
             const response = await fetch(GOOGLE_SCRIPT_URL);
             const events = await response.json();
             
             loader.style.display = 'none';
-            timeline.innerHTML = ''; // Clear current
 
-            // Filter for today's events and sort by time
-            const today = new Date().toISOString().split('T')[0];
-            const todaysEvents = events.filter(e => e.date === today)
-                                       .sort((a, b) => a.startTime.localeCompare(b.startTime));
+            // Get midnight today to safely filter out past events
+            const now = new Date();
+            const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0).getTime();
 
-            if(todaysEvents.length === 0) {
-                timeline.innerHTML = '<p class="loader">No bookings for today. Space is open!</p>';
+            const upcomingEvents = events.filter(e => {
+                if(!e.date) return false;
+                
+                // Allow browser to parse the timezone naturally to prevent shifting dates
+                const temp = new Date(e.date);
+                const eventTime = new Date(temp.getFullYear(), temp.getMonth(), temp.getDate(), 0, 0, 0).getTime();
+                
+                return eventTime >= todayMidnight; 
+            });
+
+            // Sort chronologically (Date first, then Start Time)
+            upcomingEvents.sort((a, b) => {
+                const tempA = new Date(a.date);
+                const dateA = new Date(tempA.getFullYear(), tempA.getMonth(), tempA.getDate()).getTime();
+                
+                const tempB = new Date(b.date);
+                const dateB = new Date(tempB.getFullYear(), tempB.getMonth(), tempB.getDate()).getTime();
+
+                if (dateA !== dateB) return dateA - dateB;
+                return a.startTime.localeCompare(b.startTime);
+            });
+
+            if(upcomingEvents.length === 0) {
+                timeline.innerHTML = '<div class="loader">No upcoming bookings. The space is completely open!</div>';
                 return;
             }
 
-            todaysEvents.forEach((event, index) => {
-                // Add staggered animation delay
-                const delay = index * 0.15;
+            upcomingEvents.forEach((event, index) => {
+                const delay = index * 0.1; 
+                const beautifulTimeString = formatBeautifulDate(event.date, event.startTime, event.endTime);
+
                 const html = `
                     <div class="event-card" style="animation-delay: ${delay}s">
-                        <div class="event-time">${event.startTime} - ${event.endTime}</div>
+                        <div class="event-time">${beautifulTimeString}</div>
                         <h3 class="event-title">${event.purpose}</h3>
-                        <p class="event-details"><strong>${event.name}</strong> (${event.company})</p>
+                        <p class="event-details"><strong>${event.name}</strong> • ${event.company}</p>
                     </div>
                 `;
                 timeline.insertAdjacentHTML('beforeend', html);
             });
         } catch (error) {
-            loader.innerText = 'Failed to load schedule.';
+            loader.innerText = 'Unable to load schedule. Ensure your Script URL is correct.';
         }
     }
 
@@ -305,25 +391,24 @@
         const btn = document.getElementById('submitBtn');
         const msgBox = document.getElementById('messageBox');
         
-        btn.innerText = 'Logging...';
+        btn.innerText = 'Processing...';
         btn.disabled = true;
         msgBox.style.display = 'none';
 
-        const payload = {
+        const params = new URLSearchParams({
+            action: 'save',
             name: document.getElementById('name').value,
             company: document.getElementById('company').value,
             purpose: document.getElementById('purpose').value,
             date: document.getElementById('date').value,
             startTime: document.getElementById('startTime').value,
             endTime: document.getElementById('endTime').value
-        };
+        });
+
+        const requestUrl = `${GOOGLE_SCRIPT_URL}?${params.toString()}`;
 
         try {
-            const response = await fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            });
-            
+            const response = await fetch(requestUrl);
             const result = await response.json();
             
             msgBox.style.display = 'block';
@@ -331,23 +416,25 @@
                 msgBox.className = 'success';
                 msgBox.innerText = 'Workspace booked successfully!';
                 document.getElementById('bookingForm').reset();
-                loadEvents(); // Refresh the timeline
+                
+                setTimeout(() => {
+                    msgBox.style.display = 'none';
+                    switchView('schedule');
+                }, 1500);
+
             } else {
                 msgBox.className = 'error';
-                msgBox.innerText = result.message; // Conflict message from server
+                msgBox.innerText = result.message; 
             }
         } catch (error) {
             msgBox.style.display = 'block';
             msgBox.className = 'error';
-            msgBox.innerText = 'Error saving booking. Please try again.';
+            msgBox.innerText = 'Network error. Please try again.';
         }
 
-        btn.innerText = 'Log Workspace Session';
+        btn.innerText = 'Reserve Space';
         btn.disabled = false;
     });
-
-    // Initial Load
-    loadEvents();
 </script>
 
 </body>
