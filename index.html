@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Workspace Logging</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --card-bg: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+            color: var(--text-main);
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .glass-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #D1D5DB;
+            border-radius: 8px;
+            font-family: inherit;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Timeline / Events UI */
+        .timeline {
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #E5E7EB;
+        }
+
+        .event-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.5s ease forwards;
+        }
+
+        .event-card::before {
+            content: '';
+            position: absolute;
+            left: -25px;
+            top: 24px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+
+        .event-time {
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .event-details {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .loader {
+            text-align: center;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        #messageBox {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            display: none;
+            text-align: center;
+        }
+
+        .success { background: #D1FAE5; color: #065F46; }
+        .error { background: #FEE2E2; color: #991B1B; }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Layout */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            body { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="glass-panel">
+        <h2>Book the Workspace</h2>
+        <form id="bookingForm">
+            <div class="form-group">
+                <label for="name">Your Name</label>
+                <input type="text" id="name" required placeholder="John Doe">
+            </div>
+            <div class="form-group">
+                <label for="company">Company</label>
+                <input type="text" id="company" required placeholder="Company A">
+            </div>
+            <div class="form-group">
+                <label for="purpose">What are you using it for?</label>
+                <input type="text" id="purpose" required placeholder="Client Meeting, Brainstorming, etc.">
+            </div>
+            <div class="form-group">
+                <label for="date">Date</label>
+                <input type="text" id="date" required placeholder="Select Date">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="startTime">Start Time</label>
+                    <input type="text" id="startTime" required placeholder="00:00">
+                </div>
+                <div class="form-group">
+                    <label for="endTime">End Time</label>
+                    <input type="text" id="endTime" required placeholder="00:00">
+                </div>
+            </div>
+            <button type="submit" id="submitBtn">Log Workspace Session</button>
+        </form>
+        <div id="messageBox"></div>
+    </div>
+
+    <div class="glass-panel">
+        <h2>Today's Schedule</h2>
+        <div id="eventsLoader" class="loader">Loading schedule...</div>
+        <div class="timeline" id="eventsTimeline">
+            </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    // --- IMPORTANT: REPLACE THIS URL WITH YOUR DEPLOYED GOOGLE WEB APP URL ---
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyekQjxKHmWbrBE1HAzBjKMhGY1Rd0B3WtoTyUqRlA-ze5QyrDpjoEupLi4oDBWfDOc/exec';
+
+    // Initialize Elegant Date/Time Pickers
+    flatpickr("#date", { 
+        minDate: "today",
+        dateFormat: "Y-m-d"
+    });
+    
+    flatpickr("#startTime", {
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+        time_24hr: false
+    });
+
+    flatpickr("#endTime", {
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+        time_24hr: false
+    });
+
+    // Fetch and display events
+    async function loadEvents() {
+        const timeline = document.getElementById('eventsTimeline');
+        const loader = document.getElementById('eventsLoader');
+        
+        try {
+            const response = await fetch(GOOGLE_SCRIPT_URL);
+            const events = await response.json();
+            
+            loader.style.display = 'none';
+            timeline.innerHTML = ''; // Clear current
+
+            // Filter for today's events and sort by time
+            const today = new Date().toISOString().split('T')[0];
+            const todaysEvents = events.filter(e => e.date === today)
+                                       .sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+            if(todaysEvents.length === 0) {
+                timeline.innerHTML = '<p class="loader">No bookings for today. Space is open!</p>';
+                return;
+            }
+
+            todaysEvents.forEach((event, index) => {
+                // Add staggered animation delay
+                const delay = index * 0.15;
+                const html = `
+                    <div class="event-card" style="animation-delay: ${delay}s">
+                        <div class="event-time">${event.startTime} - ${event.endTime}</div>
+                        <h3 class="event-title">${event.purpose}</h3>
+                        <p class="event-details"><strong>${event.name}</strong> (${event.company})</p>
+                    </div>
+                `;
+                timeline.insertAdjacentHTML('beforeend', html);
+            });
+        } catch (error) {
+            loader.innerText = 'Failed to load schedule.';
+        }
+    }
+
+    // Handle Form Submission
+    document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const btn = document.getElementById('submitBtn');
+        const msgBox = document.getElementById('messageBox');
+        
+        btn.innerText = 'Logging...';
+        btn.disabled = true;
+        msgBox.style.display = 'none';
+
+        const payload = {
+            name: document.getElementById('name').value,
+            company: document.getElementById('company').value,
+            purpose: document.getElementById('purpose').value,
+            date: document.getElementById('date').value,
+            startTime: document.getElementById('startTime').value,
+            endTime: document.getElementById('endTime').value
+        };
+
+        try {
+            const response = await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            
+            const result = await response.json();
+            
+            msgBox.style.display = 'block';
+            if(result.status === 'success') {
+                msgBox.className = 'success';
+                msgBox.innerText = 'Workspace booked successfully!';
+                document.getElementById('bookingForm').reset();
+                loadEvents(); // Refresh the timeline
+            } else {
+                msgBox.className = 'error';
+                msgBox.innerText = result.message; // Conflict message from server
+            }
+        } catch (error) {
+            msgBox.style.display = 'block';
+            msgBox.className = 'error';
+            msgBox.innerText = 'Error saving booking. Please try again.';
+        }
+
+        btn.innerText = 'Log Workspace Session';
+        btn.disabled = false;
+    });
+
+    // Initial Load
+    loadEvents();
+</script>
+
+</body>
+</html>
